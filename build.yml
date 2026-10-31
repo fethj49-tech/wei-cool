@@ -1,0 +1,72 @@
+package com.weicool.app
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent { MaterialTheme { WeiCoolApp() } }
+    }
+}
+
+@Composable
+fun WeiCoolApp() {
+    var code by remember { mutableStateOf("// Start building with Wei\\n") }
+    var input by remember { mutableStateOf("") }
+    var console by remember { mutableStateOf("Console ready.") }
+    val messages = remember { mutableStateListOf("Wei: Offline starter mode is ready.") }
+
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Text("Wei Cool", style = MaterialTheme.typography.headlineMedium)
+        Text("Project: Untitled")
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = {
+                console = "Preview prepared. Code execution is not enabled in this starter."
+            }) { Text("▶ Play") }
+        }
+
+        Text("Code editor")
+        OutlinedTextField(
+            value = code, onValueChange = { code = it },
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            minLines = 6, label = { Text("Code") }
+        )
+
+        Text("Console: $console")
+        Column(Modifier.weight(0.7f).verticalScroll(rememberScrollState())) {
+            messages.forEach { Text(it, Modifier.padding(vertical = 3.dp)) }
+        }
+
+        Row {
+            OutlinedTextField(
+                value = input, onValueChange = { input = it },
+                modifier = Modifier.weight(1f), label = { Text("Ask Wei") }
+            )
+            Button(onClick = {
+                val prompt = input.trim()
+                if (prompt.isNotEmpty()) {
+                    messages.add("You: $prompt")
+                    val answer = when {
+                        "code" in prompt.lowercase() ->
+                            "Wei: I can help draft code. Tell me the language and what it should do."
+                        "hello" in prompt.lowercase() ->
+                            "Wei: Hello. I’m ready to help with your project."
+                        else ->
+                            "Wei: I’m in offline starter mode. I can respond to simple prompts; connect an AI model for broader assistance."
+                    }
+                    messages.add(answer)
+                    input = ""
+                }
+            }) { Text("Send") }
+        }
+    }
+}
