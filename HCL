@@ -1,0 +1,16 @@
+terraform {
+  backend "remote" {
+    organization = "your-org"
+    workspaces {
+      name = "your-workspace"
+    }
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_s3_bucket" "example" {
+  bucket = "my-unique-bucket-name"
+}
